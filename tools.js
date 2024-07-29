@@ -2,6 +2,40 @@ const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
+export const litClass = ({
+  description,
+  name,
+  tagName,
+  cssProperties,
+  attributes,
+  events,
+  slots,
+}) => {
+  return `
+  import { html, css, LitElement } from 'lit';
+  import { customElement, property } from 'lit/decorators.js';
+
+  ${classComment({ cssProperties, description, slots })}
+  
+  @customElement('${tagName}')
+  export class ${name} extends LitElement {
+      ${cssPropertiesMembers(cssProperties)}
+      ${attributeMembers(attributes)}
+      ${eventsMembers(events)}
+      render() {
+          return html\`
+          ${nameRenderer(name, tagName)}
+          ${descriptionRenderer(description)}
+          ${cssPropertiesRenderer(cssProperties)}
+          ${attributesRenderer(attributes)}
+          ${eventsRenderer(events)}
+          ${slotRenderer(slots)}
+          \`
+      }
+  }
+`;
+};
+
 export const slotRenderer = (slots) => {
   return `
     ${

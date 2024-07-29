@@ -8,7 +8,7 @@
 npm install @addasoft/skeleton-component-generator
 ```
 
-Project has peerDependencies on `lit` and `prettier`.
+Project has a dependency `prettier`.
 
 ## Usage
 

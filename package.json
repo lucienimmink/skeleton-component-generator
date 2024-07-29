@@ -4,11 +4,21 @@
   "description": "Create skeleton web components using Lit based on given Custom Elements Manifest",
   "main": "index.js",
   "type": "module",
+  "module": "index.js",
+  "private": false,
+  "files": [
+    "index.js",
+    "tools.js"
+  ],
   "scripts": {
     "generate": "node index.js --"
   },
   "bin": {
     "skeleton-component-generator": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:lucienimmink/skeleton-component-generator.git"
   },
   "keywords": [
     "lit",
@@ -19,11 +29,14 @@
   "author": "Lucien Immink",
   "license": "MIT",
   "peerDependencies": {
-    "lit": "^3.1.4",
-    "prettier": "^3.3.3"
+    "lit": "^3.1.4"
   },
   "volta": {
     "node": "20.16.0",
     "npm": "10.8.2"
+  },
+  "dependencies": {
+    "@addasoft/skeleton-component-generator": "^1.0.0",
+    "prettier": "^3.3.3"
   }
 }
