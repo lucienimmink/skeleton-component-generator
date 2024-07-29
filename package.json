@@ -1,0 +1,29 @@
+{
+  "name": "@addasoft/skeleton-component-generator",
+  "version": "1.0.0",
+  "description": "Create skeleton web components using Lit based on given Custom Elements Manifest",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "generate": "node index.js --"
+  },
+  "bin": {
+    "skeleton-component-generator": "index.js"
+  },
+  "keywords": [
+    "lit",
+    "CEM",
+    "custom-elements",
+    "api-first"
+  ],
+  "author": "Lucien Immink",
+  "license": "MIT",
+  "peerDependencies": {
+    "lit": "^3.1.4",
+    "prettier": "^3.3.3"
+  },
+  "volta": {
+    "node": "20.16.0",
+    "npm": "10.8.2"
+  }
+}
