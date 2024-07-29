@@ -19,8 +19,6 @@ const options = program.opts();
 const CEMPATH = options.cem ?? "./test/custom-elements.json";
 const GENERATEDPATH = options.gen ?? "./test";
 
-console.log(options);
-
 console.log(
   `Skeleton-component-generator. Input: ${CEMPATH}; Output: ${GENERATEDPATH}`
 );
