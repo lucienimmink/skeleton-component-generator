@@ -1,16 +1,19 @@
 #! /usr/bin/env node
 
 import * as fs from "node:fs/promises";
-import * as prettier from "prettier";
+import { styleText } from "node:util";
+
 import { program } from "commander";
 
-import { litClass } from "./tools.js";
+import { generateCustomElement } from "./tools.js";
 
 program
   .name("skeleton-component-generator")
-  .description("Create skeleton web components using Lit based on given Custom Elements Manifest.")
-  .option('--cem <path>', 'path to the custom elements manifest to use')
-  .option('--gen <path>', 'path to the output directory')
+  .description(
+    "Create skeleton web components using Lit based on given Custom Elements Manifest."
+  )
+  .option("--cem <path>", "path to the custom elements manifest to use")
+  .option("--gen <path>", "path to the output directory");
 
 program.parse(process.argv);
 
@@ -20,34 +23,19 @@ const CEMPATH = options.cem ?? "./test/custom-elements.json";
 const GENERATEDPATH = options.gen ?? "./test";
 
 console.log(
-  `Skeleton-component-generator. Input: ${CEMPATH}; Output: ${GENERATEDPATH}`
+  `Skeleton-component-generator. Input: ${styleText(`green`, CEMPATH)}; Output: ${styleText(`green`, GENERATEDPATH)}`
 );
 
 const cemFile = await fs.readFile(CEMPATH, "utf-8");
 const cem = JSON.parse(cemFile);
 
-const generateLitElement = async (declaration) => {
-  const { name, superclass, tagName } = declaration;
-  if (superclass.package === "lit") {
-    console.log(
-      `Generating class ${name} with tag ${tagName}, based on ${superclass.package}`
-    );
-    const contents = await prettier.format(litClass(declaration), {
-      semi: false,
-      parser: "typescript",
-    });
-    await fs.writeFile(`${GENERATEDPATH}/${name}.ts`, contents);
-  } else {
-    console.log(`Skipping ${name}, for now this only works with lit`);
-  }
-};
-
 cem?.modules.map((module) => {
   const declarations = module.declarations;
-  declarations.map((declaration) => {
+  declarations.map(async (declaration) => {
     const isCustomElement = declaration.customElement;
     if (isCustomElement) {
-      generateLitElement(declaration);
+      const {name, contents} = generateCustomElement(declaration);
+      if (contents) await fs.writeFile(`${GENERATEDPATH}/${name}.ts`, contents);
     }
   });
 });

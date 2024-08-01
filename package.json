@@ -1,6 +1,6 @@
 {
   "name": "@addasoft/skeleton-component-generator",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Create skeleton web components using Lit based on given Custom Elements Manifest",
   "main": "index.js",
   "type": "module",
@@ -38,5 +38,8 @@
   "dependencies": {
     "commander": "^12.1.0",
     "prettier": "^3.3.3"
+  },
+  "engines": {
+    "node": "20.16.0"
   }
 }

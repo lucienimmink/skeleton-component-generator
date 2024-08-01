@@ -1,8 +1,30 @@
+import { styleText } from "node:util";
+
+import * as prettier from "prettier";
+
 const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-export const litClass = ({
+export const generateCustomElement = async (declaration) => {
+  const { name, superclass, tagName } = declaration;
+  if (superclass.package === "lit") {
+    console.log(
+      `Generating class ${styleText(`green`, name)} with tag ${styleText(`green`, `<${tagName}></${tagName}>`)}, based on ${styleText(`blue`, superclass.package)}`
+    );
+    const contents = await prettier.format(litClass(declaration), {
+      semi: false,
+      parser: "typescript",
+    });
+    return {name, contents};
+  } else {
+    console.log(
+      `Skipping ${styleText(`red`, name)}, for now this only works with lit`
+    );
+  }
+};
+
+const litClass = ({
   description,
   name,
   tagName,
@@ -195,32 +217,32 @@ export const cssPropertiesMembers = (cssProperties) => {
     `;
 };
 
-export const classComment = ({cssProperties, description, slots}) => {
-    return `
+export const classComment = ({ cssProperties, description, slots }) => {
+  return `
     ${
-        cssProperties
-          ? `
+      cssProperties
+        ? `
 /**
 ${description ? `* ${description}\n*` : ``}
 ${
-    slots
+  slots
     ? `
 ${slots
-    .map((slot) => {
+  .map((slot) => {
     return `* @slot ${slot.name} - ${slot.description}\n`;
-    })
-    .join("")}
+  })
+  .join("")}
 `
     : ``
 }
 ${cssProperties
-    .map((cssProperty) => {
+  .map((cssProperty) => {
     return `* @cssprop [${cssProperty.name}=${cssProperty.default}] - ${cssProperty.description}\n`;
-    })
-    .join("")}
+  })
+  .join("")}
 */    
       `
-          : ``
-      }
+        : ``
+    }
     `;
-}
+};
