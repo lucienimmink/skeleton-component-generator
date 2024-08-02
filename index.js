@@ -47,10 +47,11 @@ const generateLitElement = async declaration => {
 
 cem?.modules.map(module => {
   const declarations = module.declarations;
-  declarations.map(declaration => {
+  declarations.map(async declaration => {
     const isCustomElement = declaration.customElement;
     if (isCustomElement) {
-      generateLitElement(declaration);
+      const {name, contents} = generateCustomElement(declaration);
+      if (contents) await fs.writeFile(`${GENERATEDPATH}/${name}.ts`, contents);
     }
   });
 });
