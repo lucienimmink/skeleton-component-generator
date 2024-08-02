@@ -1,40 +1,43 @@
 #! /usr/bin/env node
 
-import * as fs from "node:fs/promises";
-import * as prettier from "prettier";
-import { program } from "commander";
+import * as fs from 'node:fs/promises';
+import { styleText } from 'node:util';
+import * as prettier from 'prettier';
+import { program } from 'commander';
 
-import { litClass } from "./tools.js";
+import { litClass } from './tools.js';
 
 program
-  .name("skeleton-component-generator")
-  .description("Create skeleton web components using Lit based on given Custom Elements Manifest.")
+  .name('skeleton-component-generator')
+  .description(
+    'Create skeleton web components using Lit based on given Custom Elements Manifest.',
+  )
   .option('--cem <path>', 'path to the custom elements manifest to use')
-  .option('--gen <path>', 'path to the output directory')
+  .option('--gen <path>', 'path to the output directory');
 
 program.parse(process.argv);
 
 const options = program.opts();
 
-const CEMPATH = options.cem ?? "./test/custom-elements.json";
-const GENERATEDPATH = options.gen ?? "./test";
+const CEMPATH = options.cem ?? './test/custom-elements.json';
+const GENERATEDPATH = options.gen ?? './test';
 
 console.log(
-  `Skeleton-component-generator. Input: ${CEMPATH}; Output: ${GENERATEDPATH}`
+  `Skeleton-component-generator. Input: ${styleText('cyan', CEMPATH)}; Output: ${styleText('green', GENERATEDPATH)}`,
 );
 
-const cemFile = await fs.readFile(CEMPATH, "utf-8");
+const cemFile = await fs.readFile(CEMPATH, 'utf-8');
 const cem = JSON.parse(cemFile);
 
-const generateLitElement = async (declaration) => {
+const generateLitElement = async declaration => {
   const { name, superclass, tagName } = declaration;
-  if (superclass.package === "lit") {
+  if (superclass.package === 'lit') {
     console.log(
-      `Generating class ${name} with tag ${tagName}, based on ${superclass.package}`
+      `Generating class ${styleText('green', name)} with tag ${styleText('cyan', tagName)}, based on ${styleText('yellow', superclass.package)}`,
     );
     const contents = await prettier.format(litClass(declaration), {
       semi: false,
-      parser: "typescript",
+      parser: 'typescript',
     });
     await fs.writeFile(`${GENERATEDPATH}/${name}.ts`, contents);
   } else {
@@ -42,9 +45,9 @@ const generateLitElement = async (declaration) => {
   }
 };
 
-cem?.modules.map((module) => {
+cem?.modules.map(module => {
   const declarations = module.declarations;
-  declarations.map((declaration) => {
+  declarations.map(declaration => {
     const isCustomElement = declaration.customElement;
     if (isCustomElement) {
       generateLitElement(declaration);
