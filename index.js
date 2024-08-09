@@ -29,7 +29,7 @@ console.log(
 const cemFile = await fs.readFile(CEMPATH, 'utf-8');
 const cem = JSON.parse(cemFile);
 
-const generateLitElement = async declaration => {
+const generateCustomElement = async declaration => {
   const { name, superclass, tagName } = declaration;
   if (superclass.package === 'lit') {
     console.log(
