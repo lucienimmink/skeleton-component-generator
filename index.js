@@ -5,7 +5,7 @@ import { styleText } from 'node:util';
 import * as prettier from 'prettier';
 import { program } from 'commander';
 
-import { litClass } from './tools.js';
+import { templateRenderer } from './tools.js';
 
 program
   .name('skeleton-component-generator')
@@ -13,7 +13,8 @@ program
     'Create skeleton web components using Lit based on given Custom Elements Manifest.',
   )
   .option('--cem <path>', 'path to the custom elements manifest to use')
-  .option('--gen <path>', 'path to the output directory');
+  .option('--gen <path>', 'path to the output directory')
+  .option('--templates <path>', 'path to directory with custom templates');
 
 program.parse(process.argv);
 
@@ -21,6 +22,7 @@ const options = program.opts();
 
 const CEMPATH = options.cem ?? './test/custom-elements.json';
 const GENERATEDPATH = options.gen ?? './test';
+const TEMPLATESPATH = options.templates ?? null;
 
 try {
   const isFile = await fs.access(CEMPATH);
@@ -42,10 +44,13 @@ const generateCustomElement = async declaration => {
     console.log(
       `Generating class ${styleText('green', name)} with tag ${styleText('cyan', tagName)}, based on ${styleText('yellow', superclass.package)}`,
     );
-    const contents = await prettier.format(litClass(declaration), {
-      semi: false,
-      parser: 'typescript',
-    });
+    const contents = await prettier.format(
+      await templateRenderer(declaration, TEMPLATESPATH),
+      {
+        semi: false,
+        parser: 'typescript',
+      },
+    );
     await fs.writeFile(`${GENERATEDPATH}/${name}.ts`, contents);
   } else {
     console.log(`Skipping ${name}, for now this only works with lit`);

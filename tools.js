@@ -1,3 +1,5 @@
+import { styleText } from 'node:util';
+
 const capitalizeFirstLetter = string => {
   if (string === 'any') return 'Object';
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -30,7 +32,45 @@ const getAttributesDefault = (type, value) => {
   }
 };
 
-export const litClass = ({
+const generateCustomTemplates = async TEMPLATESPATH => {
+  const templateParts = [
+    'customElement',
+    'classComment',
+    'cssPropertiesMembers',
+    'attributeMembers',
+    'eventsMembers',
+    'nameRenderer',
+    'descriptionRenderer',
+    'cssPropertiesRenderer',
+    'attributesRenderer',
+    'eventsRenderer',
+    'slotRenderer',
+  ];
+  const templates = {};
+  await Promise.all(
+    templateParts.map(async template => {
+      try {
+        const templateImport = await import(`${TEMPLATESPATH}/${template}.js`);
+        templates[template] = templateImport.render;
+      } catch (e) {
+        console.log(
+          `No template found for ${styleText('yellow', template)}, will use default instead`,
+        );
+        templates[template] = eval(template);
+      }
+    }),
+  );
+  return templates;
+};
+
+export const templateRenderer = async (declaration, TEMPLATESPATH) => {
+  if (!TEMPLATESPATH) return litClassRenderer(declaration);
+  console.log(`Using ${styleText('cyan', TEMPLATESPATH)} as templates`);
+  const templates = await generateCustomTemplates(TEMPLATESPATH);
+  return templates.customElement(declaration, templates);
+};
+
+const litClassRenderer = ({
   description,
   name,
   tagName,
@@ -64,7 +104,7 @@ export const litClass = ({
 `;
 };
 
-export const slotRenderer = slots => {
+const slotRenderer = slots => {
   return `
     ${
       slots
@@ -85,7 +125,7 @@ export const slotRenderer = slots => {
     `;
 };
 
-export const eventsRenderer = events => {
+const eventsRenderer = events => {
   return `
     ${
       events
@@ -104,7 +144,7 @@ export const eventsRenderer = events => {
     `;
 };
 
-export const attributesRenderer = attributes => {
+const attributesRenderer = attributes => {
   return `
     ${
       attributes
@@ -123,7 +163,7 @@ export const attributesRenderer = attributes => {
     `;
 };
 
-export const cssPropertiesRenderer = cssProperties => {
+const cssPropertiesRenderer = cssProperties => {
   return `
     ${
       cssProperties
@@ -142,19 +182,19 @@ export const cssPropertiesRenderer = cssProperties => {
     `;
 };
 
-export const descriptionRenderer = description => {
+const descriptionRenderer = description => {
   return `
     ${description ? `<p>${description}</p>` : ``}
     `;
 };
 
-export const nameRenderer = (name, tagName) => {
+const nameRenderer = (name, tagName) => {
   return `
     <h1>${name} - &lt;${tagName}&gt;&lt;/${tagName}&gt;</h1>
     `;
 };
 
-export const eventsMembers = events => {
+const eventsMembers = events => {
   return `
     ${
       events
@@ -176,7 +216,7 @@ export const eventsMembers = events => {
     `;
 };
 
-export const attributeMembers = attributes => {
+const attributeMembers = attributes => {
   return `
     ${
       attributes
@@ -197,7 +237,7 @@ export const attributeMembers = attributes => {
     `;
 };
 
-export const cssPropertiesMembers = cssProperties => {
+const cssPropertiesMembers = cssProperties => {
   return `
     ${
       cssProperties
@@ -223,7 +263,7 @@ export const cssPropertiesMembers = cssProperties => {
     `;
 };
 
-export const classComment = ({ cssProperties, description, slots }) => {
+const classComment = ({ cssProperties, description, slots }) => {
   return `
     ${
       cssProperties
