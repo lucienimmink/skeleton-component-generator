@@ -24,6 +24,13 @@ const CEMPATH = options.cem ?? './test/custom-elements.json';
 const GENERATEDPATH = options.gen ?? './test';
 const TEMPLATESPATH = options.templates ?? null;
 
+try {
+  const isFile = await fs.access(CEMPATH);
+} catch (e) {
+  console.log(`CEM not found at path ${styleText('cyan', CEMPATH)}`);
+  process.exit(1);
+}
+
 console.log(
   `Skeleton-component-generator. Input: ${styleText('cyan', CEMPATH)}; Output: ${styleText('green', GENERATEDPATH)}`,
 );
