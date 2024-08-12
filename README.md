@@ -16,6 +16,86 @@ Project has a dependency `prettier`.
 
 `skeleton-component-generator --cem=[path to cem] --gen=[path to output generated files]`.
 
+### Speficy custom templates
+
+Added in `1.1.0`. Ability to override the template(s) that are used to generate parts of the skeleton class. Use the parameter `--templates <path>` to point to a specific directory containing the overrides.
+If no override for a template is found in the given path the internal default will be used instead. Templates need to include a `render()` function that returns the output of the template. The `render()` function accepts parameters as defined in the `customElement` template. By default the parameter points to the object with the same name in CEM. So for example the `slots` template uses the `slots` object in CEM as the parameter.
+
+#### Example
+
+```javascript
+export const render = slots => {
+  return `
+    ${
+      slots
+        ? `
+          <h2>Slots</h2>
+          <ul>
+          ${slots
+            .map(slot => {
+              return `<li>Slot ${slot.name} (${slot.description}):
+                  <slot name="${slot.name}"></slot>
+              </li>\n`;
+            })
+            .join('')}
+          </ul>  
+      `
+        : ``
+    }
+    `;
+};
+```
+
+If you override the `customElement` template (the root template) you need to include the list of available templates. By overriding the `customElement` template you can also use different Custom Elements libraries instead of Lit, you are in full control.
+
+#### Example
+
+```javascript
+export const render = (
+  { description, name, tagName, cssProperties, attributes, events, slots },
+  { classComment, cssPropertiesMembers, attributeMembers, eventsMembers, nameRenderer, descriptionRenderer, cssPropertiesRenderer, attributesRenderer, eventsRenderer, slotRenderer },
+) => {
+  return `
+    import { html, css, LitElement } from 'lit';
+    import { customElement, property } from 'lit/decorators.js';
+
+    ${classComment({ cssProperties, description, slots })}
+
+    @customElement('${tagName}')
+    export class ${name} extends LitElement {
+        ${cssPropertiesMembers(cssProperties)}
+        ${attributeMembers(attributes)}
+        ${eventsMembers(events)}
+
+        render() {
+          return html\`
+          ${nameRenderer(name, tagName)}
+          ${descriptionRenderer(description)}
+          ${cssPropertiesRenderer(cssProperties)}
+          ${attributesRenderer(attributes)}
+          ${eventsRenderer(events)}
+          ${slotRenderer(slots)}
+          \`
+      }
+    }
+  `;
+};
+```
+
+### Available templates
+
+- customElement - base template. accepts &lt;declaration&gt; and &lt;templates&gt;
+- attributeMembers - template to render the attributes as a list. accepts &lt;attributes&gt;
+- attributesRenderer - template for showing the attributes. accepts &lt;attributes&gt;
+- classComment - template to render comments at the top of the class. accepts &lt;declaration&gt;
+- cssPropertiesMembers - template to render the CSS properties. accepts &lt;cssProperties&gt;
+- cssPropertiesRenderer - template to render the CSS properties as a list. accepts &lt;cssProperties&gt;
+- descriptionRenderer - template to render the description. accepts &lt;description&gt;
+- eventsMembers - template to create a function that triggers the event. accepts &lt;events&gt;
+- eventsRenderer - template to render buttons to trigger the event functions. accepts &lt;events&gt;
+- nameRenderer - template to render the class name and custom element name. accepts &lt;name&gt; and &lt;tagName&gt;
+- slotRenderer - template to render a slot. accepts &lt;slots&gt;
+
 ## Example
 
 ### CEM
