@@ -22,6 +22,13 @@ const options = program.opts();
 const CEMPATH = options.cem ?? './test/custom-elements.json';
 const GENERATEDPATH = options.gen ?? './test';
 
+try {
+  const isFile = await fs.access(CEMPATH);
+} catch (e) {
+  console.log(`CEM not found at path ${styleText('cyan', CEMPATH)}`);
+  process.exit(1);
+}
+
 console.log(
   `Skeleton-component-generator. Input: ${styleText('cyan', CEMPATH)}; Output: ${styleText('green', GENERATEDPATH)}`,
 );
@@ -50,7 +57,7 @@ cem?.modules.map(module => {
   declarations.map(async declaration => {
     const isCustomElement = declaration.customElement;
     if (isCustomElement) {
-      const {name, contents} = generateCustomElement(declaration);
+      const { name, contents } = generateCustomElement(declaration);
       if (contents) await fs.writeFile(`${GENERATEDPATH}/${name}.ts`, contents);
     }
   });
