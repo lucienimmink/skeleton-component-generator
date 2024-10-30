@@ -34,11 +34,11 @@
     "tslib": "^2.6.3"
   },
   "volta": {
-    "node": "20.18.0",
+    "node": "22.11.0",
     "npm": "10.9.0"
   },
   "engines": {
-    "node": "^20.16.0"
+    "node": "^22.0.0"
   },
   "dependencies": {
     "commander": "^12.1.0",
